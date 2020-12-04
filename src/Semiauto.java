@@ -5,7 +5,7 @@ import processing.event.MouseEvent;
 import java.util.Arrays;
 
 public class Semiauto extends PApplet {
-    String imgName = "/home/lev/IdeaProjects/allocator/modules/core/src/com/haulmont/arthur/allocator/core/solver_utils/tests/photoelast/data/Р01-125кг.jpg";
+    String imgName = "/home/lev/Документы/2020 Магистратура/Photoelasticity/semiauto/data/Р01-125кг.jpg";
 
     int
             N = 4; // number of curve
@@ -59,7 +59,8 @@ public class Semiauto extends PApplet {
                 + " max=" + nfs(max_KI, 0, 3)
                 + " abs=" + nfs(absDev_KI, 0, 3)
                 + " std=" + nfs(std_KI, 0, 3), 10, 35);
-        //text(KI, 10, 35);
+        //
+        text(points + " points", 10, 70);
 
 //        fill(0, 0, 255);
 //        text(KI_lastPoint, 10, 70);
@@ -229,11 +230,46 @@ public class Semiauto extends PApplet {
             dragMode = !dragMode;
         } else if (key == 'g' || key == 'G' || key == 'п' || key == 'П') {
             grayscale();
+        } else if (key == 'W' || key == 'w' || key == 'Ц' || key == 'ц') {
+            savePoints();
         }
+    }
+
+    void savePoints() {
+        points = 0;
+        for (boolean selectedPoint : selectedPoints) {
+            if (!selectedPoint) continue;
+            points++;
+        }
+
+        String[] strings = new String[points];
+
+        for (int i = 0, p = 0; i < selectedPoints.length; i++) {
+            if (!selectedPoints[i]) continue;
+
+            int
+                    px = i % srcImg.width,
+                    py = i / srcImg.width;
+
+            float
+                    pointX = px * sampleW / srcImg.width,
+                    pointY = py * sampleW / srcImg.width;
+//                    dx = pointX - centerX,
+//                    dy = pointY - centerY,
+//                    r = sqrt(dx * dx + dy * dy),
+//                    sinPhi = -dy / r;
+//
+//            float ki = sqrt(2 * PI * r) * N * fSigma / (h * sinPhi);
+            strings[p++] = pointX + ", " + pointY;
+        }
+
+        saveStrings("points.txt", strings);
     }
 
     float KI = 0, KI_lastPoint = 0, 
         min_KI = 0, max_KI = 0, absDev_KI = 0, std_KI = 0;
+
+    int points = 0;
 
     void calculate() {
         KI = 0;
@@ -243,7 +279,7 @@ public class Semiauto extends PApplet {
         absDev_KI = 0;
         std_KI = 0;
 
-        int points = 0;
+        points = 0;
         for (boolean selectedPoint : selectedPoints) {
             if (!selectedPoint) continue;
             points++;
